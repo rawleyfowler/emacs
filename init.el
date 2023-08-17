@@ -25,12 +25,12 @@
 (setq indent-tabs-mode nil)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
-(global-linum-mode)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (show-paren-mode 1)
 (recentf-mode 1)
+(global-display-line-numbers-mode 1)
 
 (defun set-exec-path-from-shell ()
   "Set up Emacs' 'exec-path' and PATH environment."
@@ -140,6 +140,7 @@
                          :slant       'italic
                          )
      ))
+(add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode)) ; Mojo templates
 
 ;; PHP
 (add-to-list 'auto-mode-alist '("\\.blade.php\\'" . web-mode))
@@ -159,7 +160,13 @@
  '(delete-selection-mode nil)
  '(package-selected-packages '(raku-mode docker-compose-mode flycheck dracula-theme))
  '(safe-local-variable-values
-   '((eval let
+   '((eval setq flycheck-perl-include-path
+           (add-to-list 'flycheck-perl-include-path
+                        (concat
+                         (expand-file-name
+                          (locate-dominating-file default-directory ".dir-locals.el"))
+                         "lib")))
+     (eval let
            ((project-dir
              (expand-file-name
               (locate-dominating-file default-directory ".dir-locals.el"))))
