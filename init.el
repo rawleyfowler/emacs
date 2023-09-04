@@ -187,6 +187,11 @@
   :config
   (evil-ex-define-cmd "wq" 'save-and-kill-this-buffer))
 
+(use-package flycheck
+  :ensure t
+  :config
+  (add-hook 'cperl-mode-hook 'flycheck-mode))
+
 ;; Perl
 (require 'perltidy) ; Thanks to https://github.com/zakame/perltidy.el
 (require 'perl-mode)
@@ -223,7 +228,14 @@
  ;; If there is more than one, they won't work right.
  '(delete-selection-mode nil)
  '(package-selected-packages
-   '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs)))
+   '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
+ '(safe-local-variable-values
+   '((eval setq flycheck-perl-include-path
+           (add-to-list 'flycheck-perl-include-path
+                        (concat
+                         (expand-file-name
+                          (locate-dominating-file default-directory ".dir-locals.el"))
+                         "lib"))))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
