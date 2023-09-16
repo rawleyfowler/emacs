@@ -35,6 +35,9 @@
 
 (add-to-list 'load-path "~/.emacs.d/extras")
 
+(when (eq system-type 'darwin)
+  (setq ns-function-modifier 'control))
+
 (require 'package)
 
 ;; Add melpa to your packages repositories
