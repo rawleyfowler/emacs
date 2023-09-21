@@ -53,11 +53,16 @@
 (require 'use-package)
 
 ;; Various modes
-(use-package raku-mode)
-(use-package web-mode)
-(use-package json-mode)
-(use-package php-mode)
-(use-package dockerfile-mode)
+(use-package raku-mode
+  :ensure t)
+(use-package web-mode
+  :ensure t)
+(use-package json-mode
+  :ensure t)
+(use-package php-mode
+  :ensure t)
+(use-package dockerfile-mode
+  :ensure t)
 
 ;; Enable defer and ensure by default for use-package
 ;; Keep auto-save/backup files separate from source code:  https://github.com/scalameta/metals/issues/1027
@@ -224,6 +229,13 @@
      ))
 (add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode)) ; Mojolicious templates
 
+;; Ruby
+(use-package robe
+  :ensure t
+  :config
+  (add-hook 'ruby-mode-hook 'robe-mode)
+  (add-hook 'ruby-ts-mode-hook 'robe-mode))
+
 ;; OCaml
 (use-package tuareg
   :ensure t
@@ -252,7 +264,6 @@
   :ensure t
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode))
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -260,14 +271,7 @@
  ;; If there is more than one, they won't work right.
  '(delete-selection-mode nil)
  '(package-selected-packages
-   '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
- '(safe-local-variable-values
-   '((eval setq flycheck-perl-include-path
-           (add-to-list 'flycheck-perl-include-path
-                        (concat
-                         (expand-file-name
-                          (locate-dominating-file default-directory ".dir-locals.el"))
-                         "lib"))))))
+   '(raku-mode yasnippet utop use-package tree-sitter-langs sbt-mode robe merlin-eldoc lsp-ui lsp-metals ivy-rich flycheck-ocaml evil dune counsel company)))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
