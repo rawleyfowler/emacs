@@ -38,6 +38,12 @@
 (when (eq system-type 'darwin)
   (setq ns-function-modifier 'control))
 
+(when (display-graphic-p)
+  (global-unset-key (kbd "C-z"))
+  (global-unset-key (kbd "C-x C-z")))
+
+(global-set-key (kbd "M-o") #'other-window)
+
 (require 'package)
 
 ;; Add melpa to your packages repositories
