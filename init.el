@@ -5,7 +5,7 @@
 ;;; Code:
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil :font "Monaco-16")
-  (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-16")))
+  (add-to-list 'default-frame-alist '(font . "Hermit-13")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -63,10 +63,16 @@
 
 (require 'use-package)
 
-(use-package raku-mode)
-(use-package web-mode)
-(use-package json-mode)
-(use-package dockerfile-mode)
+(use-package raku-mode
+  :ensure t)
+(use-package web-mode
+  :ensure t)
+(use-package json-mode
+  :ensure t)
+(use-package dockerfile-mode
+  :ensure t)
+(use-package nix-mode
+  :ensure t)
 
 (setq use-package-always-defer t
       use-package-always-ensure t
