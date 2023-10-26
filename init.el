@@ -5,7 +5,7 @@
 ;;; Code:
 (if (eq system-type 'darwin)
     (set-face-attribute 'default nil :font "Monaco-16")
-  (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-16")))
+  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font-16")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -92,6 +92,7 @@
   :hook
   (scala-mode . lsp)
   (java-mode . lsp)
+  (ruby-mode . lsp)
   (lsp-mode . lsp-lens-mode)
   :init
   (setq lsp-completion-enable t)
@@ -102,6 +103,15 @@
 (use-package lsp-ui)
 (use-package yasnippet)
 
+(use-package smartparens
+  :diminish smartparens-mode
+  :ensure smartparens
+  :init
+  (require 'smartparens-config)
+  :config
+  (smartparens-global-mode t)
+  (show-smartparens-global-mode t))
+
 (use-package lsp-java
   :after lsp)
 
@@ -110,11 +120,17 @@
   :after lsp-java
   :bind (:map java-mode-map ("C-c i" . lsp-java-add-import)))
 
+(use-package robe
+  :ensure t
+  :hook
+  (ruby-mode . robe-mode))
+
 (use-package company
   :hook
   (scala-mode . company-mode)
   (tuareg-mode . company-mode)
   (java-mode . company-mode)
+  (robe-mode . comapny-mode)
   :config
   (setq lsp-completion-provider :capf))
 
@@ -242,6 +258,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-enabled-themes '(nordic-night))
+ '(custom-safe-themes
+   '("fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
    '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
