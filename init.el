@@ -64,6 +64,11 @@
 
 (require 'use-package)
 
+(use-package nordic-night-theme
+  :ensure t
+  :config
+  (load-theme 'nordic-night t))
+
 (use-package raku-mode
   :ensure t)
 (use-package web-mode
