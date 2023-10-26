@@ -1,6 +1,7 @@
 ;;; init.el --- Rawley Fowler's Emacs Configuration
 ;;; Commentary:
-;;; A simple Emacs configuration with Evil and Ivy, for Scala and Perl development.
+;;; My Emacs configuration for ergonomic code editing in many languages.
+;;; LSP, Tree-sitter, company, and Magit <3.
 
 ;;; Code:
 (if (eq system-type 'darwin)
@@ -63,10 +64,16 @@
 
 (require 'use-package)
 
-(use-package raku-mode)
-(use-package web-mode)
-(use-package json-mode)
-(use-package dockerfile-mode)
+(use-package raku-mode
+  :ensure t)
+(use-package web-mode
+  :ensure t)
+(use-package json-mode
+  :ensure t)
+(use-package dockerfile-mode
+  :ensure t)
+(use-package nix-mode
+  :ensure t)
 
 (setq use-package-always-defer t
       use-package-always-ensure t
@@ -174,7 +181,9 @@
   :config
   (add-hook 'cperl-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'scala-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'javascript-mode #'tree-sitter-hl-mode))
+  (add-hook 'javascript-mode #'tree-sitter-hl-mode)
+  (add-hook 'ruby-mode #'tree-sitter-hl-mode)
+  (add-hook 'perl-mode #'tree-sitter-hl-mode))
 
 (use-package tree-sitter-langs
   :after tree-sitter)
@@ -252,6 +261,9 @@
   :ensure t
   :config
   (add-hook 'tuareg-mode-hook #'utop-minor-mode))
+
+(use-package magit
+  :ensure t)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
