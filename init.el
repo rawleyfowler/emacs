@@ -105,14 +105,21 @@
   (scala-mode . lsp)
   (java-mode . lsp)
   (ruby-mode . lsp)
+  (tuareg-mode . lsp)
   (lsp-mode . lsp-lens-mode)
   :init
+  (setq lsp-completion-provider 'company-mode)
   (setq lsp-completion-enable t)
-  (setq lsp-prefer-flymake nil)
-  (setq lsp-keep-workspace-alive nil))
+  (setq lsp-keep-workspace-alive nil)
+  (setq lsp-signature-render-document nil)
+  (setq lsp-modeline-code-actions-enable nil)
+  (setq lsp-headerline-breadcrumb-enable nil))
 
 (use-package lsp-metals)
-(use-package lsp-ui)
+(use-package lsp-ui
+  :init
+  (setq lsp-ui-sideline-show-code-actions nil))
+
 (use-package yasnippet)
 
 (use-package smartparens
@@ -142,7 +149,7 @@
   (scala-mode . company-mode)
   (tuareg-mode . company-mode)
   (java-mode . company-mode)
-  (robe-mode . comapny-mode)
+  (robe-mode . company-mode)
   :config
   (setq lsp-completion-provider :capf))
 
@@ -248,14 +255,7 @@
 (use-package dune
   :ensure t)
 
-(use-package merlin
-  :ensure t
-  :hook
-  ((tuareg-mode) . #'merlin-mode))
-
-(use-package merlin-eldoc
-  :ensure t
-  :hook ((tuareg-mode) . merlin-eldoc-setup))
+(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
 
 (use-package flycheck-ocaml
   :ensure t
