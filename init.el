@@ -64,6 +64,11 @@
 
 (require 'use-package)
 
+(use-package crux
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer))
+
 (use-package projectile
   :ensure t
   :init
@@ -132,6 +137,11 @@
 (use-package ccls
   :hook
   ((c-mode c++-mode objc-mode cuda-mode) . #'start-ccls))
+
+(use-package cmake-mode
+  :ensure t)
+(use-package meson-mode
+  :ensure t)
 
 (use-package lsp-metals)
 (use-package lsp-ui
