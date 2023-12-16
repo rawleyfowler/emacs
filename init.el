@@ -5,8 +5,8 @@
 
 ;;; Code:
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil :font "Monaco-16")
-  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font-16")))
+    (set-face-attribute 'default nil :font "Hurmit Nerd Font Mono-15")
+  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font Mono-15")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -27,18 +27,11 @@
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
 (show-paren-mode 1)
+(electric-pair-mode +1)
 (recentf-mode 1)
 (global-display-line-numbers-mode 1)
 (add-to-list 'image-types 'svg)
 (setq require-final-newline t)
-
-(defun set-exec-path-from-shell ()
-  "Set up Emacs' \='exec-path' and PATH environment."
-  (interactive)
-  (let ((path-from-shell (replace-regexp-in-string "[ \t\n]*$" "" (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
-    (setenv "PATH" path-from-shell)
-    (setq exec-path (split-string path-from-shell path-separator))))
-(set-exec-path-from-shell)
 
 (add-to-list 'load-path "~/.emacs.d/extras")
 
@@ -48,8 +41,6 @@
 (when (display-graphic-p)
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z")))
-
-(global-set-key (kbd "M-o") #'other-window)
 
 (require 'package)
 
@@ -62,7 +53,14 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
+(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace [0])))
+
 (require 'use-package)
+
+(use-package ack
+  :ensure t
+  :config
+  (global-set-key (kbd "C-c C-g") #'ack))
 
 (use-package crux
   :ensure t
@@ -78,11 +76,22 @@
     (kbd "C-c p")
     'projectile-command-map))
 
+(use-package treemacs
+  :ensure t)
+(use-package treemacs-evil
+  :after treemacs
+  :ensure t)
+(use-package treemacs-projectile
+  :after treemacs
+  :ensure t)
+
 (use-package nordic-night-theme
   :ensure t
   :config
   (load-theme 'nordic-night t))
 
+(use-package apache-mode
+  :ensure t)
 (use-package raku-mode
   :ensure t)
 (use-package web-mode
@@ -114,12 +123,21 @@
 (use-package flycheck
   :init (global-flycheck-mode))
 
+(use-package clojure-mode
+  :ensure t)
+
+(use-package cider
+  :ensure t)
+
 (use-package lsp-mode
   :hook
   (scala-mode . lsp)
   (java-mode . lsp)
   (ruby-mode . lsp)
   (tuareg-mode . lsp)
+  (clojure-mode . lsp)
+  (clojurec-mode . lsp)
+  (clojurescript-mode . lsp)
   (lsp-mode . lsp-lens-mode)
   :init
   (setq lsp-completion-provider 'company-mode)
@@ -128,6 +146,15 @@
   (setq lsp-signature-render-document nil)
   (setq lsp-modeline-code-actions-enable nil)
   (setq lsp-headerline-breadcrumb-enable nil))
+
+(use-package lsp-treemacs
+  :config
+  (setq gc-cons-threshold (* 100 1024 1024)
+        read-process-output-max (* 1024 1024)
+        treemacs-space-between-root-nodes nil
+        company-minimum-prefix-length 1)
+  :after lsp-mode
+  :ensure t)
 
 (defun start-ccls ()
   "Start ccls function for hooks."
@@ -149,15 +176,6 @@
   (setq lsp-ui-sideline-show-code-actions nil))
 
 (use-package yasnippet)
-
-(use-package smartparens
-  :diminish smartparens-mode
-  :ensure smartparens
-  :init
-  (require 'smartparens-config)
-  :config
-  (smartparens-global-mode t)
-  (show-smartparens-global-mode t))
 
 (use-package lsp-java
   :after lsp)
@@ -301,9 +319,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(nordic-night))
+ '(custom-enabled-themes nil)
  '(custom-safe-themes
-   '("fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
+   '("7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
    '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
