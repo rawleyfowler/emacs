@@ -98,6 +98,8 @@
   :ensure t)
 (use-package json-mode
   :ensure t)
+(use-package yaml-mode
+  :ensure t)
 (use-package dockerfile-mode
   :ensure t)
 (use-package nix-mode
@@ -129,8 +131,16 @@
 (use-package cider
   :ensure t)
 
+(use-package go-mode
+  :ensure t
+  :hook
+  (before-save . gofmt-before-save)
+  :config
+  (setq tab-width 4))
+
 (use-package lsp-mode
   :hook
+  (go-mode . lsp)
   (scala-mode . lsp)
   (java-mode . lsp)
   (ruby-mode . lsp)
@@ -175,7 +185,10 @@
   :init
   (setq lsp-ui-sideline-show-code-actions nil))
 
-(use-package yasnippet)
+(use-package yasnippet
+  :ensure t
+  :config
+  (yas-global-mode +1))
 
 (use-package lsp-java
   :after lsp)
@@ -290,6 +303,7 @@
                          )
      ))
 (add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode)) ; Mojolicious templates
+(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode)) ; Go templates
 
 ;; OCaml
 (use-package tuareg
@@ -319,7 +333,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes nil)
+ '(custom-enabled-themes '(nordic-night))
  '(custom-safe-themes
    '("7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
