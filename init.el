@@ -5,8 +5,8 @@
 
 ;;; Code:
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil :font "Hurmit Nerd Font Mono-15")
-  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font Mono-15")))
+    (set-face-attribute 'default nil :font "Iosevka Nerd Font Mono-15")
+  (add-to-list 'default-frame-alist '(font . "Iosevka Nerd Font Mono-15")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
