@@ -108,7 +108,10 @@
 (use-package raku-mode
   :ensure t)
 (use-package web-mode
-  :ensure t)
+  :ensure t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode)))
 (use-package json-mode
   :ensure t)
 (use-package yaml-mode
@@ -315,8 +318,6 @@
                          :slant       'italic
                          )
      ))
-(add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode)) ; Mojolicious templates
-(add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode)) ; Go templates
 
 ;; OCaml
 (use-package tuareg
