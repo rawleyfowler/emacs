@@ -5,8 +5,8 @@
 
 ;;; Code:
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil :font "Iosevka Nerd Font Mono-15")
-  (add-to-list 'default-frame-alist '(font . "Iosevka Nerd Font Mono-15")))
+    (set-face-attribute 'default nil :font "Hurmit Nerd Font Mono-15")
+  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font Mono-15")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -53,8 +53,6 @@
   (package-refresh-contents)
   (package-install 'use-package))
 
-(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace [0])))
-
 (require 'use-package)
 
 (use-package ack
@@ -76,15 +74,6 @@
     (kbd "C-c p")
     'projectile-command-map))
 
-(use-package treemacs
-  :ensure t)
-(use-package treemacs-evil
-  :after treemacs
-  :ensure t)
-(use-package treemacs-projectile
-  :after treemacs
-  :ensure t)
-
 (use-package all-the-icons
   :ensure t
   :if (display-graphic-p))
@@ -94,7 +83,7 @@
   :config
   (setq doom-themes-enable-bold t
         doom-themes-enable-italic t)
-  (load-theme 'doom-one t)
+  (load-theme 'doom-zenburn t)
   (doom-themes-treemacs-config)
   (doom-themes-org-config))
 
@@ -187,6 +176,7 @@
   (require 'ccls)
   (lsp-deferred))
 
+(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace [0])))
 (use-package ccls
   :hook
   ((c-mode c++-mode objc-mode cuda-mode) . #'start-ccls))
@@ -224,7 +214,7 @@
   (scala-mode . company-mode)
   (tuareg-mode . company-mode)
   (java-mode . company-mode)
-  (robe-mode . company-mode))
+  (robe-mode . company-mode))  
 
 (use-package posframe)
 
@@ -278,13 +268,6 @@
   (interactive)
   (save-buffer)
   (kill-current-buffer))
-
-(use-package evil
-  :demand t
-  :init
-  (evil-mode 1)
-  :config
-  (evil-ex-define-cmd "wq" 'save-and-kill-this-buffer))
 
 (use-package flycheck
   :ensure t
@@ -342,14 +325,20 @@
 (use-package magit
   :ensure t)
 
+(unless (package-installed-p 'evil)
+  (package-install 'evil))
+
+(require 'evil)
+(evil-mode 1)
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes nil)
+ '(custom-enabled-themes '(doom-zenburn))
  '(custom-safe-themes
-   '("88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
+   '("81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
    '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
