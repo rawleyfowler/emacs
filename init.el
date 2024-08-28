@@ -5,8 +5,8 @@
 
 ;;; Code:
 (if (eq system-type 'darwin)
-    (set-face-attribute 'default nil :font "Hurmit Nerd Font Mono-15")
-  (add-to-list 'default-frame-alist '(font . "Hurmit Nerd Font Mono-15")))
+    (set-face-attribute 'default nil :font "ComicShannsMonoNerdFontMono-15")
+  (add-to-list 'default-frame-alist '(font . "ComicShannsMonoNerdFontMono-15")))
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -33,6 +33,13 @@
 (add-to-list 'image-types 'svg)
 (setq require-final-newline t)
 
+; I hate that so much is bold for absolutely no reason.
+(mapc
+   (lambda (face)
+     (when (eq (face-attribute face :weight) 'bold)
+       (set-face-attribute face nil :weight 'normal)))
+   (face-list))
+
 (add-to-list 'load-path "~/.emacs.d/extras")
 
 (when (eq system-type 'darwin)
@@ -42,6 +49,18 @@
   (global-unset-key (kbd "C-z"))
   (global-unset-key (kbd "C-x C-z")))
 
+(defun set-exec-path-from-shell-PATH ()
+  "Set path to path from shell."
+  (let ((path-from-shell (replace-regexp-in-string
+                          "[ \t\n]*$"
+                          ""
+                          (shell-command-to-string "$SHELL --login -i -c 'echo $PATH'"))))
+    (setenv "PATH" path-from-shell)
+    (setq eshell-path-env path-from-shell)
+    (setq exec-path (split-string path-from-shell path-separator))))
+
+(when window-system (set-exec-path-from-shell-PATH))
+
 (require 'package)
 
 ;; Add melpa to your packages repositories
@@ -49,11 +68,31 @@
 
 (package-initialize)
 
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+(defvar bootstrap-version)
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
 
-(require 'use-package)
+(straight-use-package 'use-package)
+
+(use-package autothemer :ensure t)
+
+(straight-use-package
+ '(rose-pine-emacs
+   :host github
+   :repo "thongpv87/rose-pine-emacs"
+   :branch "master"))
 
 (use-package ack
   :ensure t
@@ -77,15 +116,6 @@
 (use-package all-the-icons
   :ensure t
   :if (display-graphic-p))
-(use-package doom-themes
-  :ensure t
-  :after all-the-icons
-  :config
-  (setq doom-themes-enable-bold t
-        doom-themes-enable-italic t)
-  (load-theme 'doom-zenburn t)
-  (doom-themes-treemacs-config)
-  (doom-themes-org-config))
 
 (use-package nordic-night-theme
   :ensure t
@@ -171,16 +201,6 @@
   :after lsp-mode
   :ensure t)
 
-(defun start-ccls ()
-  "Start ccls function for hooks."
-  (require 'ccls)
-  (lsp-deferred))
-
-(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace [0])))
-(use-package ccls
-  :hook
-  ((c-mode c++-mode objc-mode cuda-mode) . #'start-ccls))
-
 (use-package cmake-mode
   :ensure t)
 (use-package meson-mode
@@ -217,6 +237,7 @@
   (robe-mode . company-mode))  
 
 (use-package posframe)
+(use-package rg)
 
 (use-package dap-mode
   :hook
@@ -254,6 +275,7 @@
 
 (use-package tree-sitter
   :config
+  (add-hook 'emacs-lisp-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'cperl-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'scala-mode-hook #'tree-sitter-hl-mode)
   (add-hook 'javascript-mode #'tree-sitter-hl-mode)
@@ -275,15 +297,23 @@
   (add-hook 'cperl-mode-hook 'flycheck-mode))
 
 ;; Perl
-(require 'perltidy) ; Thanks to https://github.com/zakame/perltidy.el
+(straight-use-package
+ '(perltidy
+   :type git
+   :host github
+   :repo "perl-ide/perltidy.el"
+   :branch "master"))
+(require 'perltidy)
+(setq perltidy-on-save t)
 (require 'perl-mode)
 (require 'cperl-mode)
 (setq cperl-set-style "linux")
 (setq cperl-highlight-variables-indiscriminately t)
 (defalias 'perl-mode 'cperl-mode)
-(add-hook 'before-save-hook #'(lambda ()
-                                (when (or (eq major-mode 'perl-mode) (eq major-mode 'cperl-mode))
-                                  (perltidy-buffer))))
+
+;;(add-hook 'before-save-hook #'(lambda ()
+;;                                (when (or (eq major-mode 'perl-mode) (eq major-mode 'cperl-mode))
+;;                                  (perltidy-buffer))))
 (setq cperl-indent-parens-as-block t)
 
 (eval-after-load 'cperl-mode
@@ -302,25 +332,10 @@
                          )
      ))
 
-;; OCaml
-(use-package tuareg
-  :ensure t
-  :mode (("\\.ocamlinit\\'" . tuareg-mode)))
-
-(use-package dune
-  :ensure t)
-
-(require 'opam-user-setup "~/.emacs.d/opam-user-setup.el")
-
-(use-package flycheck-ocaml
-  :ensure t
-  :config
-  (flycheck-ocaml-setup))
-
-(use-package utop
-  :ensure t
-  :config
-  (add-hook 'tuareg-mode-hook #'utop-minor-mode))
+(setq flycheck-perl-include-path
+      (add-to-list
+       'flycheck-perl-include-path
+       "/home/rawley/perl5/lib/perl5/"))
 
 (use-package magit
   :ensure t)
@@ -336,14 +351,23 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(doom-zenburn))
+ '(custom-enabled-themes '(rose-pine-color))
  '(custom-safe-themes
-   '("81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
+   '("9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392" "b5fd9c7429d52190235f2383e47d340d7ff769f141cd8f9e7a4629a81abc6b19" "6454421996f0508c38215a633256e36c19a28591542fb0946cfc40f1dceb89cf" "81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
-   '(evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
+   '(rg evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
  '(safe-local-variable-values
    '((eval setq flycheck-perl-include-path
+           (add-to-list 'flycheck-perl-include-path
+                        (concat
+                         (projectile-project-root)
+                         "lib")))
+     (flycheck-perl-include-path concat
+                                 (projectile-project-root)
+                                 "lib")
+     (c-indentation-style . bsd)
+     (eval setq flycheck-perl-include-path
            (add-to-list 'flycheck-perl-include-path
                         (concat
                          (expand-file-name
