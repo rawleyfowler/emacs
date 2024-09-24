@@ -310,10 +310,6 @@
 (setq cperl-set-style "linux")
 (setq cperl-highlight-variables-indiscriminately t)
 (defalias 'perl-mode 'cperl-mode)
-
-;;(add-hook 'before-save-hook #'(lambda ()
-;;                                (when (or (eq major-mode 'perl-mode) (eq major-mode 'cperl-mode))
-;;                                  (perltidy-buffer))))
 (setq cperl-indent-parens-as-block t)
 
 (eval-after-load 'cperl-mode
@@ -351,9 +347,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(rose-pine-color))
+ '(custom-enabled-themes '(doom-solarized-dark))
  '(custom-safe-themes
-   '("9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392" "b5fd9c7429d52190235f2383e47d340d7ff769f141cd8f9e7a4629a81abc6b19" "6454421996f0508c38215a633256e36c19a28591542fb0946cfc40f1dceb89cf" "81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
+   '("ffafb0e9f63935183713b204c11d22225008559fa62133a69848835f4f4a758c" "9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392" "b5fd9c7429d52190235f2383e47d340d7ff769f141cd8f9e7a4629a81abc6b19" "6454421996f0508c38215a633256e36c19a28591542fb0946cfc40f1dceb89cf" "81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
    '(rg evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
