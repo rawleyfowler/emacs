@@ -104,18 +104,6 @@
   :config
   (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer))
 
-(use-package projectile
-  :ensure t
-  :init
-  (projectile-mode +1)
-  :config
-  (define-key projectile-mode-map
-    (kbd "C-c p")
-    'projectile-command-map))
-
-(use-package all-the-icons
-  :ensure t
-  :if (display-graphic-p))
 
 (use-package nordic-night-theme
   :ensure t
@@ -234,7 +222,7 @@
   (scala-mode . company-mode)
   (tuareg-mode . company-mode)
   (java-mode . company-mode)
-  (robe-mode . company-mode))  
+  (robe-mode . company-mode))
 
 (use-package posframe)
 (use-package rg)
@@ -331,7 +319,7 @@
 (setq flycheck-perl-include-path
       (add-to-list
        'flycheck-perl-include-path
-       "/home/rawley/perl5/lib/perl5/"))
+       "~/perl5/lib/perl5/"))
 
 (use-package magit
   :ensure t)
@@ -347,9 +335,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes '(doom-solarized-dark))
+ '(custom-enabled-themes '(nordic-night))
  '(custom-safe-themes
-   '("ffafb0e9f63935183713b204c11d22225008559fa62133a69848835f4f4a758c" "9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392" "b5fd9c7429d52190235f2383e47d340d7ff769f141cd8f9e7a4629a81abc6b19" "6454421996f0508c38215a633256e36c19a28591542fb0946cfc40f1dceb89cf" "81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
+   '("ba5c5bdef8de41ffa8eca30fc56e7404d6e787d7836702f5e367794a759393c5" "4d16802de4686030ed8f30b5a844713d68edec9cc07322bef54493d15e68d8cd" "e9aa348abd3713a75f2c5ba279aa581b1c6ec187ebefbfa33373083ff8004c7c" "ffafb0e9f63935183713b204c11d22225008559fa62133a69848835f4f4a758c" "9013233028d9798f901e5e8efb31841c24c12444d3b6e92580080505d56fd392" "b5fd9c7429d52190235f2383e47d340d7ff769f141cd8f9e7a4629a81abc6b19" "6454421996f0508c38215a633256e36c19a28591542fb0946cfc40f1dceb89cf" "81f53ee9ddd3f8559f94c127c9327d578e264c574cda7c6d9daddaec226f87bb" "dd4582661a1c6b865a33b89312c97a13a3885dc95992e2e5fc57456b4c545176" "88f7ee5594021c60a4a6a1c275614103de8c1435d6d08cc58882f920e0cec65e" "7c7026a406042e060bce2b56c77d715c3a4e608c31579d336cb825b09e60e827" "fa7caecc85dd0aaf60d4f74e42300a1a69f32efbad61fbd3ca26d0dcf6dfedd5" default))
  '(delete-selection-mode nil)
  '(package-selected-packages
    '(rg evil-mode ivy-rich counsel dap-mode company yasnippet lsp-ui lsp-metals lsp-mode sbt-mode yaml-mode web-mode tree-sitter-langs spinner smex scala-mode s raku-mode php-mode markdown-mode magit lv json-mode ht flycheck evil dracula-theme dockerfile-mode ctrlf centaur-tabs))
