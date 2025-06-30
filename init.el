@@ -334,7 +334,7 @@
 (require 'evil)
 (evil-mode 1)
 
-(disable-theme) ; For now...
+(mapcar #'disable-theme custom-enabled-themes) ; Use default emacs theme.
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
