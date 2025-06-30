@@ -118,7 +118,9 @@
   :ensure t
   :config
   (add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode)))
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tt2\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.tt\\'" . web-mode)))
 (use-package json-mode
   :ensure t)
 (use-package yaml-mode
@@ -329,6 +331,8 @@
 
 (require 'evil)
 (evil-mode 1)
+
+(disable-theme) ; For now...
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
