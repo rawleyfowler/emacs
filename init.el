@@ -121,6 +121,8 @@
   (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tt2\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.tt\\'" . web-mode)))
+(use-package caddyfile-mode
+  :ensure t)
 (use-package json-mode
   :ensure t)
 (use-package yaml-mode
