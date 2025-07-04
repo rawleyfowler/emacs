@@ -10,7 +10,7 @@
 (setq visible-bell nil)
 (setq ring-bell-function 'ignore)
 (setq shell-file-name "/bin/bash")
-(setq shell-command-switch "-ic")
+(setq shell-command-switch "-c")
 (setq indent-tabs-mode nil)
 (setq require-final-newline t)
 (setq frame-inhibit-implied-resize t)
@@ -27,6 +27,8 @@
 (global-display-line-numbers-mode 1)
 (add-to-list 'image-types 'svg)
 (setq require-final-newline t)
+
+(set-face-attribute 'default nil :height 120)
 
 ;; Stupid bold font for no reason, BEGONE!
 (mapc
@@ -97,12 +99,7 @@
 
 ;; The best linter/code checker ever made
 (use-package flycheck
-  :init (global-flycheck-mode)
-  :config
-  (setq flycheck-perl-include-path ; Lookup our local Perl libs.
-	(add-to-list
-	 'flycheck-perl-include-path
-	 "~/perl5/lib/perl5/")))
+  :init (global-flycheck-mode))
 
 ;; Generic completion
 (use-package ivy
@@ -203,19 +200,22 @@
 (setq perltidy-on-save t)
 (require 'perl-mode)
 (require 'cperl-mode)
+(require 'projectile)
 (setq cperl-set-style "linux")
 (setq cperl-highlight-variables-indiscriminately t)
 (defalias 'perl-mode 'cperl-mode)
 (setq cperl-indent-parens-as-block t)
 
-(let ((rf-perl-version (shell-command-to-string "perl -e 'print $]'")))
-  '((cperl-mode
-        (flycheck-perl-include-path . (concat "~/perl5/perlbrew/perls/perl-"
-                        'rf-perl-version
-                        "lib"
-                        'rf-perl-version))
-        (when (projectile-project-p)
-          (flycheck-perl-include-path . (concat (projectile-project-root) "/lib"))))))
+;; Set Perl include path
+(setq flycheck-perl-include-path '())
+
+;;; This is kinda ugly, assuming you use perlbrew its fine :)
+(when (file-directory-p "~/perl5/perlbrew")
+  (let ((rf-perl-version (shell-command-to-string "source ~/.bashrc && perl -e 'print($^V =~ s/v//r)' 2> /dev/null")))
+    (add-to-list 'flycheck-perl-include-path (concat "~/perl5/perlbrew/perls/perl-" rf-perl-version "/lib/" rf-perl-version))))
+(add-hook 'cperl-mode-hook
+          (lambda ()
+            (add-to-list 'flycheck-perl-include-path (concat (projectile-project-root) "lib"))))
 
 (eval-after-load 'cperl-mode
   '(progn
@@ -232,9 +232,10 @@
                          :slant       'italic
                          )
      ))
+
 ;;;; END cperl-mode
 
-(custom-set-variables
+(custom-set-variables)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
