@@ -28,6 +28,8 @@
 (add-to-list 'image-types 'svg)
 (setq require-final-newline t)
 
+(setq warning-minimum-level :error) ; Don't show *warnings*
+
 (set-face-attribute 'default nil :height 120)
 
 ;; Stupid bold font for no reason, BEGONE!
@@ -97,6 +99,10 @@
   :config
   (global-set-key (kbd "C-c r") #'crux-rename-file-and-buffer))
 
+;; Need this for some reason??
+(use-package flymake-jsts
+  :straight '(flymake-jsts :type git :host github :repo "orzechowskid/flymake-jsts" :branch "main"))
+
 ;; The best linter/code checker ever made
 (use-package flycheck
   :init (global-flycheck-mode))
@@ -129,18 +135,6 @@
   :bind (("C-s" . swiper)
          ("C-r" . swiper)))
 
-;; Better highlighting
-(use-package tree-sitter
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'cperl-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'scala-mode-hook #'tree-sitter-hl-mode)
-  (add-hook 'javascript-mode #'tree-sitter-hl-mode)
-  (add-hook 'ruby-mode #'tree-sitter-hl-mode)
-  (add-hook 'perl-mode #'tree-sitter-hl-mode))
-(use-package tree-sitter-langs
-  :after tree-sitter)
-
 ;; Debug adapter
 (use-package dap-mode
   :hook
@@ -172,9 +166,17 @@
 (use-package json-mode)
 (use-package dockerfile-mode)
 (use-package nix-mode)
-(use-package clojure-mode)
 (use-package cmake-mode)
 (use-package meson-mode)
+(use-package typescript-ts-mode)
+(use-package tsx-mode
+  :straight '(tsx-mode
+              :type git
+              :host github
+              :repo "orzechowskid/tsx-mode.el"
+              :branch "emacs30"))
+
+
 
 ;;; With config
 
@@ -205,18 +207,22 @@
 (setq cperl-highlight-variables-indiscriminately t)
 (defalias 'perl-mode 'cperl-mode)
 (setq cperl-indent-parens-as-block t)
+(add-to-list 'auto-mode-alist '("\\.\\(p\\([lm]\\)\\)\\'" . cperl-mode))
+(setq cperl-basic-offset 2)
 
-;; Set Perl include path
+;;; Set Perl include path
 (setq flycheck-perl-include-path '())
 
 ;;; This is kinda ugly, assuming you use perlbrew its fine :)
 (when (file-directory-p "~/perl5/perlbrew")
   (let ((rf-perl-version (shell-command-to-string "source ~/.bashrc && perl -e 'print($^V =~ s/v//r)' 2> /dev/null")))
     (add-to-list 'flycheck-perl-include-path (concat "~/perl5/perlbrew/perls/perl-" rf-perl-version "/lib/" rf-perl-version))))
+
 (add-hook 'cperl-mode-hook
           (lambda ()
             (add-to-list 'flycheck-perl-include-path (concat (projectile-project-root) "lib"))))
 
+;;; cperl-mode does some ugly stuff
 (eval-after-load 'cperl-mode
   '(progn
      (set-face-attribute 'cperl-array-face nil
@@ -234,6 +240,117 @@
      ))
 
 ;;;; END cperl-mode
+
+;;;; BEGIN corfu
+(use-package corfu
+  :ensure t
+  ;; Optional customizations
+  :custom
+  (corfu-cycle t)                 ; Allows cycling through candidates
+  (corfu-auto t)                  ; Enable auto completion
+  (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
+  (corfu-auto-delay 0)            ; No delay for completion
+  (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
+  (corfu-preview-current 'insert) ; insert previewed candidate
+  (corfu-preselect 'prompt)
+  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+  ;; Optionally use TAB for cycling, default is `corfu-complete'.
+  :bind (:map corfu-map
+              ("TAB"        . corfu-next)
+              ([tab]        . corfu-next)
+              ("S-TAB"      . corfu-previous)
+              ([backtab]    . corfu-previous)
+              ("S-<return>" . corfu-insert)
+              ("RET"        . corfu-insert))
+
+  :init
+  (global-corfu-mode)
+  (corfu-history-mode)
+  (corfu-popupinfo-mode) ; Popup completion info
+  :config
+  (add-hook 'eshell-mode-hook
+            (lambda () (setq-local corfu-quit-at-boundary t
+                                   corfu-quit-no-match t
+                                   corfu-auto nil)
+              (corfu-mode))
+            nil
+            t))
+;;;; END corfu
+
+;;;; BEGIN lsp
+
+(use-package lsp-mode
+  :diminish "LSP"
+  :ensure t
+  :hook ((lsp-mode . lsp-diagnostics-mode)
+         (lsp-mode . lsp-enable-which-key-integration)
+         ((tsx-ts-mode
+           typescript-ts-mode
+           js-ts-mode) . lsp-deferred))
+  :custom
+  (lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
+  (lsp-completion-provider :none)       ; Using Corfu as the provider
+  (lsp-diagnostics-provider :flycheck)
+  (lsp-session-file (locate-user-emacs-file ".lsp-session"))
+  (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
+  (lsp-keep-workspace-alive nil)        ; Close LSP server if all project buffers are closed
+  (lsp-idle-delay 0.5)                  ; Debounce timer for `after-change-function'
+  ;; core
+  (lsp-enable-xref t)                   ; Use xref to find references
+  (lsp-auto-configure t)                ; Used to decide between current active servers
+  (lsp-eldoc-enable-hover t)            ; Display signature information in the echo area
+  (lsp-enable-dap-auto-configure t)     ; Debug support
+  (lsp-enable-file-watchers nil)
+  (lsp-enable-folding nil)              ; I disable folding since I use origami
+  (lsp-enable-imenu t)
+  (lsp-enable-indentation nil)          ; I use prettier
+  (lsp-enable-links nil)                ; No need since we have `browse-url'
+  (lsp-enable-suggest-server-download t) ; Useful prompt to download LSP providers
+  (lsp-enable-symbol-highlighting t)     ; Shows usages of symbol at point in the current buffer
+  (lsp-enable-text-document-color nil)   ; This is Treesitter's job
+
+  (lsp-ui-sideline-show-hover nil)      ; Sideline used only for diagnostics
+  (lsp-ui-sideline-diagnostic-max-lines 20) ; 20 lines since typescript errors can be quite big
+  ;; completion
+  (lsp-completion-enable t)
+  (lsp-completion-enable-additional-text-edit t) ; Ex: auto-insert an import for a completion candidate
+  (lsp-enable-snippet t)                         ; Important to provide full JSX completion
+  (lsp-completion-show-kind t)                   ; Optional
+  ;; headerline
+  (lsp-headerline-breadcrumb-enable t)  ; Optional, I like the breadcrumbs
+  (lsp-headerline-breadcrumb-enable-diagnostics nil) ; Don't make them red, too noisy
+  (lsp-headerline-breadcrumb-enable-symbol-numbers nil)
+  (lsp-headerline-breadcrumb-icons-enable nil)
+  ;; modeline
+  (lsp-modeline-code-actions-enable nil) ; Modeline should be relatively clean
+  (lsp-modeline-diagnostics-enable nil)  ; Already supported through `flycheck'
+  (lsp-modeline-workspace-status-enable nil) ; Modeline displays "LSP" when lsp-mode is enabled
+  (lsp-signature-doc-lines 1)                ; Don't raise the echo area. It's distracting
+  (lsp-ui-doc-use-childframe t)              ; Show docs for symbol at point
+  (lsp-eldoc-render-all nil)            ; This would be very useful if it would respect `lsp-signature-doc-lines', currently it's distracting
+  ;; lens
+  (lsp-lens-enable nil)                 ; Optional, I don't need it
+  ;; semantic
+  (lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
+
+  :init
+  (setq lsp-use-plists t))
+
+(use-package lsp-ui
+  :ensure t
+  :commands
+  (lsp-ui-doc-show
+   lsp-ui-doc-glance)
+  :bind (:map lsp-mode-map
+              ("C-c C-d" . 'lsp-ui-doc-glance))
+  :after (lsp-mode evil)
+  :config (setq lsp-ui-doc-enable t
+                evil-lookup-func #'lsp-ui-doc-glance ; Makes K in evil-mode toggle the doc for symbol at point
+                lsp-ui-doc-show-with-cursor nil      ; Don't show doc when cursor is over symbol - too distracting
+                lsp-ui-doc-include-signature t       ; Show signature
+                lsp-ui-doc-position 'at-point))
+
+;;;; END lsp
 
 (custom-set-variables)
 (custom-set-faces
