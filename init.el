@@ -1,7 +1,7 @@
 ;;; init.el --- Rawley Fowler's Emacs Configuration
 ;;; Commentary:
 ;;; My Emacs configuration for ergonomic UNIX oriented code-editing.
-
+;;; Code:
 (make-directory "~/.emacs_backups/" t)
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
@@ -29,8 +29,7 @@
 (setq require-final-newline t)
 
 (setq warning-minimum-level :error) ; Don't show *warnings*
-
-(set-face-attribute 'default nil :height 120)
+(set-frame-font "UbuntuMono 14" nil t)
 
 ;; Stupid bold font for no reason, BEGONE!
 (mapc
@@ -180,8 +179,24 @@
 
 ;;; With config
 
-;;;; BEGIN: web-mode
+;;;; BEGIN theming
+(use-package all-the-icons)
+(use-package doom-themes
+  :custom
+  ;; Global settings (defaults)
+  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
+  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  :config
+  (load-theme 'doom-Iosvkem t)
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+  ;; Enable custom neotree theme (nerd-icons must be installed!)
+  (doom-themes-neotree-config)
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+;;;;
 
+;;;; BEGIN: web-mode
 (use-package web-mode
   :ensure t
   :config
@@ -198,7 +213,6 @@
 ;;;; END: web-mode
 
 ;;;; BEGIN: cperl-mode
-
 (setq perltidy-on-save t)
 (require 'perl-mode)
 (require 'cperl-mode)
@@ -278,13 +292,15 @@
 ;;;; END corfu
 
 ;;;; BEGIN lsp
-
+(use-package yasnippet)
+(use-package which-key)
 (use-package lsp-mode
   :diminish "LSP"
   :ensure t
   :hook ((lsp-mode . lsp-diagnostics-mode)
          (lsp-mode . lsp-enable-which-key-integration)
-         ((tsx-ts-mode
+         ((cperl-mode
+           tsx-ts-mode
            typescript-ts-mode
            js-ts-mode) . lsp-deferred))
   :custom
