@@ -6,7 +6,6 @@
 (make-directory "~/.emacs_autosave/" t)
 (setq auto-save-file-name-transforms '((".*" "~/.emacs_autosave/" t)))
 (setq backup-directory-alist '(("." . "~/.emacs_backups/")))
-(setq package-enable-at-startup nil)
 (setq visible-bell nil)
 (setq ring-bell-function 'ignore)
 (setq shell-file-name "/bin/bash")
@@ -29,7 +28,7 @@
 (setq require-final-newline t)
 
 (setq warning-minimum-level :error) ; Don't show *warnings*
-(set-frame-font "UbuntuMono 14" nil t)
+(set-frame-font "Ubuntu Mono 12" nil t)
 
 ;; Stupid bold font for no reason, BEGONE!
 (mapc
@@ -46,10 +45,6 @@
 ;;
 ;; PACKAGES
 ;;
-
-;; Package init
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 
 ;; Straight.el
 (defvar bootstrap-version)
@@ -69,6 +64,7 @@
   (load bootstrap-file nil 'nomessage))
 
 (straight-use-package 'use-package) ; use-package install
+(setq straight-use-package-by-default t) ; always use straight to install packages
 (setq use-package-always-ensure t) ; always auto-install packages
 
 ;; UTILS
@@ -92,6 +88,11 @@
 (use-package ack
   :config
   (global-set-key (kbd "C-c C-g") #'ack))
+
+;; Dynamic tabbing
+(use-package dtrt-indent
+  :config
+  (dtrt-indent-global-mode t))
 
 ;; M-x crux-rename-file-and-buffer, etc.
 (use-package crux
@@ -160,6 +161,7 @@
 
 ;;; No config
 (use-package apache-mode)
+(use-package yaml-mode)
 (use-package raku-mode)
 (use-package caddyfile-mode)
 (use-package json-mode)
@@ -180,7 +182,12 @@
 ;;; With config
 
 ;;;; BEGIN theming
+;; I install a lot of themes for seemingly no reason :~)
 (use-package all-the-icons)
+(use-package nerd-icons)
+(use-package doom-modeline
+  :init
+  (doom-modeline-mode +1))
 (use-package doom-themes
   :custom
   ;; Global settings (defaults)
@@ -194,6 +201,9 @@
   (doom-themes-neotree-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
+(use-package darcula-theme
+  :config
+  (load-theme 'darcula t))
 ;;;;
 
 ;;;; BEGIN: web-mode
@@ -350,7 +360,11 @@
   (lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
 
   :init
-  (setq lsp-use-plists t))
+  (setq lsp-use-plists t)
+  :config
+  (add-hook 'lsp-mode-hook (lambda ()
+                             (setq-local completion-styles '(orderless)
+                                         completion-category-defaults nil)))
 
 (use-package lsp-ui
   :ensure t
