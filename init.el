@@ -26,9 +26,9 @@
 (global-display-line-numbers-mode 1)
 (add-to-list 'image-types 'svg)
 (setq require-final-newline t)
-
 (setq warning-minimum-level :error) ; Don't show *warnings*
-(set-frame-font "Ubuntu Mono 12" nil t)
+
+(set-frame-font "ComicShannsMono Nerd Font-13" nil t)
 
 ;; Stupid bold font for no reason, BEGONE!
 (mapc
@@ -159,7 +159,7 @@
 
 ;; MODES
 
-;;; No config
+;;; No config use-packages
 (use-package apache-mode)
 (use-package yaml-mode)
 (use-package raku-mode)
@@ -177,33 +177,32 @@
               :repo "orzechowskid/tsx-mode.el"
               :branch "emacs30"))
 
-
-
 ;;; With config
 
 ;;;; BEGIN theming
-;; I install a lot of themes for seemingly no reason :~)
 (use-package all-the-icons)
 (use-package nerd-icons)
 (use-package doom-modeline
+  :ensure t
   :init
+  (setq doom-modeline-height 25)
+  (setq doom-modeline-major-mode-icon t)
+  (setq doom-modeline-major-mode-color-icon t)
+  (setq doom-modeline-lsp-icon t)
   (doom-modeline-mode +1))
 (use-package doom-themes
   :custom
   ;; Global settings (defaults)
-  (doom-themes-enable-bold t)   ; if nil, bold is universally disabled
-  (doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (doom-themes-enable-bold nil)   ; if nil, bold is universally disabled
+  (doom-themes-enable-italic nil) ; if nil, italics is universally disabled
   :config
-  (load-theme 'doom-Iosvkem t)
+  (load-theme 'doom-city-lights t)
   ;; Enable flashing mode-line on errors
   (doom-themes-visual-bell-config)
   ;; Enable custom neotree theme (nerd-icons must be installed!)
   (doom-themes-neotree-config)
   ;; Corrects (and improves) org-mode's native fontification.
   (doom-themes-org-config))
-(use-package darcula-theme
-  :config
-  (load-theme 'darcula t))
 ;;;;
 
 ;;;; BEGIN: web-mode
@@ -265,57 +264,62 @@
 
 ;;;; END cperl-mode
 
-;;;; BEGIN corfu
-(use-package corfu
+;;;; BEGIN go-mode
+(use-package go-mode
   :ensure t
-  ;; Optional customizations
-  :custom
-  (corfu-cycle t)                 ; Allows cycling through candidates
-  (corfu-auto t)                  ; Enable auto completion
-  (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
-  (corfu-auto-delay 0)            ; No delay for completion
-  (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
-  (corfu-preview-current 'insert) ; insert previewed candidate
-  (corfu-preselect 'prompt)
-  (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
-  ;; Optionally use TAB for cycling, default is `corfu-complete'.
-  :bind (:map corfu-map
-              ("TAB"        . corfu-next)
-              ([tab]        . corfu-next)
-              ("S-TAB"      . corfu-previous)
-              ([backtab]    . corfu-previous)
-              ("S-<return>" . corfu-insert)
-              ("RET"        . corfu-insert))
-
-  :init
-  (global-corfu-mode)
-  (corfu-history-mode)
-  (corfu-popupinfo-mode) ; Popup completion info
   :config
-  (add-hook 'eshell-mode-hook
-            (lambda () (setq-local corfu-quit-at-boundary t
-                                   corfu-quit-no-match t
-                                   corfu-auto nil)
-              (corfu-mode))
-            nil
-            t))
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
+  :init
+  (add-hook 'before-save-hook #'gofmt-before-save))
+;;;; END go-mode
+
+;;;; BEGIN corfu
+; (use-package corfu
+;   :ensure t
+;   ;; Optional customizations
+;   :custom
+;   (corfu-cycle t)                 ; Allows cycling through candidates
+;   (corfu-auto t)                  ; Enable auto completion
+;   (corfu-auto-prefix 2)           ; Minimum length of prefix for completion
+;   (corfu-auto-delay 0)            ; No delay for completion
+;   (corfu-popupinfo-delay '(0.5 . 0.2))  ; Automatically update info popup after that numver of seconds
+;   (corfu-preview-current 'insert) ; insert previewed candidate
+;   (corfu-preselect 'prompt)
+;   (corfu-on-exact-match nil)      ; Don't auto expand tempel snippets
+;   ;; Optionally use TAB for cycling, default is `corfu-complete'.
+;   :bind (:map corfu-map
+;               ("TAB"        . corfu-next)
+;               ([tab]        . corfu-next)
+;               ("S-TAB"      . corfu-previous)
+;               ([backtab]    . corfu-previous)
+;               ("S-<return>" . corfu-insert)
+;               ("RET"        . corfu-insert))
+; 
+;   :init
+;   (global-corfu-mode)
+;   (corfu-history-mode)
+;   (corfu-popupinfo-mode) ; Popup completion info
+;   :config
+;   (add-hook 'eshell-mode-hook
+;             (lambda () (setq-local corfu-quit-at-boundary t
+;                                    corfu-quit-no-match t
+;                                    corfu-auto nil)
+;               (corfu-mode))
+;             nil
+;             t))
 ;;;; END corfu
+
+(use-package company
+  :ensure t
+  :init (global-company-mode))
 
 ;;;; BEGIN lsp
 (use-package yasnippet)
 (use-package which-key)
 (use-package lsp-mode
-  :diminish "LSP"
   :ensure t
-  :hook ((lsp-mode . lsp-diagnostics-mode)
-         (lsp-mode . lsp-enable-which-key-integration)
-         ((cperl-mode
-           tsx-ts-mode
-           typescript-ts-mode
-           js-ts-mode) . lsp-deferred))
   :custom
   (lsp-keymap-prefix "C-c l")           ; Prefix for LSP actions
-  (lsp-completion-provider :none)       ; Using Corfu as the provider
   (lsp-diagnostics-provider :flycheck)
   (lsp-session-file (locate-user-emacs-file ".lsp-session"))
   (lsp-log-io nil)                      ; IMPORTANT! Use only for debugging! Drastically affects performance
@@ -329,18 +333,15 @@
   (lsp-enable-file-watchers nil)
   (lsp-enable-folding nil)              ; I disable folding since I use origami
   (lsp-enable-imenu t)
-  (lsp-enable-indentation nil)          ; I use prettier
   (lsp-enable-links nil)                ; No need since we have `browse-url'
   (lsp-enable-suggest-server-download t) ; Useful prompt to download LSP providers
   (lsp-enable-symbol-highlighting t)     ; Shows usages of symbol at point in the current buffer
   (lsp-enable-text-document-color nil)   ; This is Treesitter's job
-
   (lsp-ui-sideline-show-hover nil)      ; Sideline used only for diagnostics
   (lsp-ui-sideline-diagnostic-max-lines 20) ; 20 lines since typescript errors can be quite big
   ;; completion
   (lsp-completion-enable t)
   (lsp-completion-enable-additional-text-edit t) ; Ex: auto-insert an import for a completion candidate
-  (lsp-enable-snippet t)                         ; Important to provide full JSX completion
   (lsp-completion-show-kind t)                   ; Optional
   ;; headerline
   (lsp-headerline-breadcrumb-enable t)  ; Optional, I like the breadcrumbs
@@ -358,14 +359,18 @@
   (lsp-lens-enable nil)                 ; Optional, I don't need it
   ;; semantic
   (lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
-
+  (lsp-format-buffer-on-size-list '(c++-mode))
   :init
   (setq lsp-use-plists t)
   :config
+  (setq lsp-warn-no-matched-clients nil) ; Don't warn on unsupported modes.
+  (add-hook 'go-mode-hook 'lsp)
+  (add-hook 'c++-mode-hook 'lsp)
+  (add-hook 'lsp-mode-hook 'lsp-diagnostics-mode)
+  (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook (lambda ()
                              (setq-local completion-styles '(orderless)
-                                         completion-category-defaults nil)))
-
+                                         completion-category-defaults nil))))
 (use-package lsp-ui
   :ensure t
   :commands
