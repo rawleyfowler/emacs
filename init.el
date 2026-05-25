@@ -268,10 +268,12 @@
 (use-package go-mode
   :ensure t
   :config
-  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))
-  :init
-  (add-hook 'before-save-hook #'gofmt-before-save))
+  (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode)))
 ;;;; END go-mode
+
+;;;; BEGIN c++-mode
+(add-hook 'c++-mode-hook (lambda () (c-set-offset 'innamespace 0)))
+;;;; END c++-mode
 
 ;;;; BEGIN corfu
 ; (use-package corfu
@@ -359,18 +361,21 @@
   (lsp-lens-enable nil)                 ; Optional, I don't need it
   ;; semantic
   (lsp-semantic-tokens-enable nil)      ; Related to highlighting, and we defer to treesitter
-  (lsp-format-buffer-on-size-list '(c++-mode))
   :init
   (setq lsp-use-plists t)
+  (setq lsp-format-buffer-on-save t)
+  (setq lsp-format-buffer-on-save-list '(c++-mode c-mode go-mode))
+  (setq lsp-warn-no-matched-clients nil) ; Don't warn on unsupported modes
+  (setq lsp-clients-clangd-executable "clangd")
   :config
-  (setq lsp-warn-no-matched-clients nil) ; Don't warn on unsupported modes.
   (add-hook 'go-mode-hook 'lsp)
   (add-hook 'c++-mode-hook 'lsp)
   (add-hook 'lsp-mode-hook 'lsp-diagnostics-mode)
   (add-hook 'lsp-mode-hook 'lsp-enable-which-key-integration)
   (add-hook 'lsp-mode-hook (lambda ()
-                             (setq-local completion-styles '(orderless)
+                             (setq-local completion-styles '(basic partial-completion orderless)
                                          completion-category-defaults nil))))
+
 (use-package lsp-ui
   :ensure t
   :commands
