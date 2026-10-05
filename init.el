@@ -167,7 +167,6 @@
 (use-package json-mode)
 (use-package dockerfile-mode)
 (use-package nix-mode)
-(use-package cmake-mode)
 (use-package meson-mode)
 (use-package typescript-ts-mode)
 (use-package tsx-mode
@@ -212,6 +211,7 @@
   (add-to-list 'auto-mode-alist '("\\.tmpl\\'" . web-mode))     ; Go, OCaml templates
   (add-to-list 'auto-mode-alist '("\\.html.ep\\'" . web-mode))  ; Mojolicious
   (add-to-list 'auto-mode-alist '("\\.ep\\'" . web-mode))       ; Mojolicious
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))      ; ERB (Ruby)
   (add-to-list 'auto-mode-alist '("\\.tt2\\'" . web-mode))      ; Template::Toolkit
   (add-to-list 'auto-mode-alist '("\\.html.tt2\\'" . web-mode)) ; Template::Toolkit
   (add-to-list 'auto-mode-alist '("\\.tt\\'" . web-mode))       ; Template::Toolkit
